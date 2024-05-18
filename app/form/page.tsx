@@ -1,6 +1,8 @@
 "use client";
 
+import PanelFillingTable from "@/components/table/PanelFillingTable";
 import {
+  Box,
   Fieldset,
   Grid,
   MultiSelect,
@@ -28,6 +30,37 @@ export default function Form() {
     "Other",
   ];
 
+  const baseData = [
+    {
+      layer: "Layer 1",
+      description: "POLYESTER",
+      weight: "900",
+      sizeWidth: "075",
+      supplier: "JOHN COTTON",
+    },
+    {
+      layer: "Layer 2",
+      description: "TITAN PAD",
+      weight: "750",
+      sizeWidth: "090",
+      supplier: "JOHN COTTON",
+    },
+    // Add more base rows if needed
+  ];
+
+  const generateData = (baseData: any[], count: number) => {
+    let data: any[] = [];
+    for (let i = 0; i < count; i++) {
+      data = data.concat(
+        baseData.map((item, index) => ({
+          ...item,
+          layer: `Layer ${index + 1 + i * baseData.length}`,
+        }))
+      );
+    }
+    return data;
+  };
+
   const form = useForm({
     mode: "uncontrolled",
     initialValues: {
@@ -41,7 +74,7 @@ export default function Form() {
   });
 
   return (
-    <div>
+    <Box>
       <form onSubmit={form.onSubmit((values) => console.log(values))}>
         <Fieldset
           legend="Product information"
@@ -167,7 +200,22 @@ export default function Form() {
             </Grid>
           </SimpleGrid>
         </Fieldset>
+
+        <PanelFillingTable
+          title="PANEL FILLINGS (Tick Downwards)"
+          data={generateData(baseData, 10)}
+        />
+
+        <PanelFillingTable
+          title="PANEL FILLINGS SECOMD SIDE (Tick Downwards)"
+          data={generateData(baseData, 1)}
+        />
+
+        <PanelFillingTable
+          title="BORDER FILLINGS"
+          data={generateData(baseData, 1)}
+        />
       </form>
-    </div>
+    </Box>
   );
 }
