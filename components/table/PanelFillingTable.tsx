@@ -1,30 +1,66 @@
-"use-client";
+"use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Table,
   ScrollArea,
   Box,
   Button,
   Text,
-  Group,
+  TextInput,
+  Modal,
   useMantineTheme,
 } from "@mantine/core";
+import { useForm } from "@mantine/form";
+import useFormStore, { IFormStore, IPanelFilling } from "@/store/useFormStore";
 
-// Create interface
 interface PanelFillingTableProps {
   title: string;
-  data: {
-    layer: string;
-    description: string;
-    weight: string;
-    sizeWidth: string;
-    supplier: string;
-  }[];
+  data: IPanelFilling[];
+  formField: keyof IFormStore;
 }
 
-const PanelFillingTable = ({ title, data }: PanelFillingTableProps) => {
+const PanelFillingTable: React.FC<PanelFillingTableProps> = ({
+  title,
+  data,
+  formField,
+}) => {
   const theme = useMantineTheme();
+  const updatePanelFilling = useFormStore((state) => state.updatePanelFilling);
+
+  const [modalOpened, setModalOpened] = useState(false);
+
+  const form = useForm({
+    initialValues: {
+      layer: "",
+      description: "",
+      weight: 0,
+      sizeWidth: 0,
+      supplier: "",
+    },
+    validate: {
+      layer: (value) => (value ? null : "Layer is required"),
+      description: (value) => (value ? null : "Description is required"),
+      weight: (value) =>
+        value && !isNaN(Number(value)) ? null : "Weight must be a number",
+      sizeWidth: (value) =>
+        value && !isNaN(Number(value)) ? null : "Size/Width must be a number",
+      supplier: (value) => (value ? null : "Supplier is required"),
+    },
+  });
+
+  const handleAddLayer = (values: typeof form.values) => {
+    updatePanelFilling(formField, [...data, values]);
+    form.reset();
+    setModalOpened(false); // Close the modal after adding the layer
+  };
+
+  useEffect(() => {
+    if (modalOpened) {
+      form.setFieldValue("layer", `Layer ${data.length + 1}`);
+    }
+  }, [modalOpened, data.length, form]);
+
   return (
     <Box
       style={{
@@ -43,7 +79,7 @@ const PanelFillingTable = ({ title, data }: PanelFillingTableProps) => {
         }}
       >
         <Text size="lg">{title}</Text>
-        <Button variant="subtle" size="sm">
+        <Button variant="subtle" size="sm" onClick={() => setModalOpened(true)}>
           + Add Layer
         </Button>
       </Box>
@@ -77,9 +113,6 @@ const PanelFillingTable = ({ title, data }: PanelFillingTableProps) => {
               padding: "0rem 1.5rem",
               borderTop: "none",
               borderBottom: "1px solid rgb(222, 226, 230)",
-            },
-            "td.no-padding": {
-              padding: 0,
             },
             "th:not(.max), td:not(.max)": {
               width: 0,
@@ -121,16 +154,44 @@ const PanelFillingTable = ({ title, data }: PanelFillingTableProps) => {
           </Table.Tbody>
         </Table>
       </ScrollArea>
+
+      <Modal
+        opened={modalOpened}
+        onClose={() => setModalOpened(false)}
+        title="Add New Layer"
+      >
+        <form onSubmit={form.onSubmit(handleAddLayer)}>
+          <TextInput
+            placeholder="Layer"
+            disabled
+            {...form.getInputProps("layer")}
+            mb="xs"
+          />
+          <TextInput
+            placeholder="Description"
+            {...form.getInputProps("description")}
+            mb="xs"
+          />
+          <TextInput
+            placeholder="Weight"
+            {...form.getInputProps("weight")}
+            mb="xs"
+          />
+          <TextInput
+            placeholder="Size/Width"
+            {...form.getInputProps("sizeWidth")}
+            mb="xs"
+          />
+          <TextInput
+            placeholder="Supplier"
+            {...form.getInputProps("supplier")}
+            mb="xs"
+          />
+          <Button type="submit">Add Layer</Button>
+        </form>
+      </Modal>
     </Box>
   );
 };
 
-const PanelFillings = (tableData: PanelFillingTableProps) => {
-  return (
-    <Box my="lg">
-      <PanelFillingTable title={tableData.title} data={tableData.data} />
-    </Box>
-  );
-};
-
-export default PanelFillings;
+export default PanelFillingTable;
