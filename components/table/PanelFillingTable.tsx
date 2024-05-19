@@ -63,10 +63,10 @@ const PanelFillingTable: React.FC<PanelFillingTableProps> = ({
 
   return (
     <Box
+      my="lg"
       style={{
         padding: "20px",
         borderRadius: "10px",
-        marginBottom: "20px",
         border: `1px solid ${theme.colors.gray[3]}`,
       }}
     >
