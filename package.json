@@ -17,7 +17,8 @@
     "@mantine/modals": "^7.9.1",
     "next": "14.2.3",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "zustand": "^4.5.2"
   },
   "devDependencies": {
     "@mantinex/mantine-logo": "^1.0.1",
