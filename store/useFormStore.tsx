@@ -21,6 +21,12 @@ export interface IFormStore {
   dateRequired: string;
   comments: string;
   labelType: string[];
+  springType: string[];
+  quiltType: string[];
+  accessories: string[];
+  patternNumber: string[];
+  borderType: string[];
+  borderDepth: string;
   panelFillingTopLayer: IPanelFilling[];
   panelFillingBottomLayer: IPanelFilling[];
   borderFilling: IPanelFilling[];
@@ -42,6 +48,12 @@ const useFormStore = create<IFormStore>((set) => ({
   dateRequired: "",
   comments: "",
   labelType: [],
+  springType: [],
+  quiltType: [],
+  accessories: [],
+  patternNumber: [],
+  borderType: [],
+  borderDepth: "",
   panelFillingTopLayer: [],
   panelFillingBottomLayer: [],
   borderFilling: [],

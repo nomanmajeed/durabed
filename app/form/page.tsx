@@ -14,6 +14,14 @@ import {
 } from "@mantine/core";
 import useFormStore from "@/store/useFormStore";
 import PanelFillingTable from "@/components/table/PanelFillingTable";
+import {
+  LABEL_TYPE_DATA,
+  MATTRESS_ACCESSORIES_DATA,
+  MATTRESS_BORDER_DATA,
+  MATTRESS_PATTERN_NUMBER_DATA,
+  MATTRESS_QUILT_TYPE_DATA,
+  MATTRESS_SPRING_TYPE_DATA,
+} from "@/constants/constants";
 
 export default function Form() {
   const theme = useMantineTheme();
@@ -30,25 +38,18 @@ export default function Form() {
     dateRequired,
     comments,
     labelType,
+    springType,
+    quiltType,
+    accessories,
+    patternNumber,
+    borderType,
+    borderDepth,
     panelFillingTopLayer,
     panelFillingBottomLayer,
     borderFilling,
     updateField,
     submitForm,
   } = useFormStore();
-
-  const LABEL_TYPE_DATA = [
-    "Dura Beds",
-    "Own Label",
-    "No Label",
-    "Centre",
-    "Corner",
-    "Tag Label",
-    "Ortho",
-    "Pocket",
-    "Twin Spring",
-    "Other",
-  ];
 
   return (
     <Box my="md">
@@ -181,6 +182,78 @@ export default function Form() {
                   searchable
                   value={labelType}
                   onChange={(values) => updateField("labelType", values)}
+                />
+              </Grid.Col>
+            </Grid>
+          </SimpleGrid>
+        </Fieldset>
+
+        <Fieldset
+          my="md"
+          legend="Mattress"
+          style={{
+            backgroundColor: theme.colors.gray[0],
+            padding: rem(20),
+            borderRadius: rem(10),
+          }}
+        >
+          <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="xl" mx={"xl"}>
+            <Grid gutter="md">
+              <Grid.Col>
+                <MultiSelect
+                  label="Spring Type"
+                  data={MATTRESS_SPRING_TYPE_DATA}
+                  searchable
+                  value={springType}
+                  onChange={(values) => updateField("springType", values)}
+                />
+              </Grid.Col>
+              <Grid.Col>
+                <MultiSelect
+                  label="Quilt Type"
+                  data={MATTRESS_QUILT_TYPE_DATA}
+                  searchable
+                  value={quiltType}
+                  onChange={(values) => updateField("quiltType", values)}
+                />
+              </Grid.Col>
+            </Grid>
+            <Grid gutter="md">
+              <Grid.Col>
+                <MultiSelect
+                  label="Accessories"
+                  data={MATTRESS_ACCESSORIES_DATA}
+                  searchable
+                  value={accessories}
+                  onChange={(values) => updateField("accessories", values)}
+                />
+              </Grid.Col>
+              <Grid.Col>
+                <MultiSelect
+                  label="Pattern No."
+                  data={MATTRESS_PATTERN_NUMBER_DATA}
+                  searchable
+                  value={patternNumber}
+                  onChange={(values) => updateField("patternNumber", values)}
+                />
+              </Grid.Col>
+            </Grid>
+            <Grid gutter="md">
+              <Grid.Col>
+                <MultiSelect
+                  label="Border"
+                  data={MATTRESS_BORDER_DATA}
+                  searchable
+                  value={borderType}
+                  onChange={(values) => updateField("borderType", values)}
+                />
+              </Grid.Col>
+              <Grid.Col>
+                <TextInput
+                  label="Border Depth"
+                  placeholder="9.5 inches"
+                  value={borderDepth}
+                  onChange={(e) => updateField("borderDepth", e.target.value)}
                 />
               </Grid.Col>
             </Grid>
