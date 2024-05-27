@@ -24,6 +24,8 @@ import {
   MATTRESS_SPRING_TYPE_DATA,
 } from "@/constants/constants";
 
+import { IconX, IconCheck } from "@tabler/icons-react";
+
 export default function Form() {
   const theme = useMantineTheme();
   const {
@@ -105,6 +107,17 @@ export default function Form() {
   });
 
   const handleSubmit = (values: any) => {
+    // Check if panel filling data is empty
+    if (
+      !panelFillingTopLayer.length &&
+      !panelFillingBottomLayer.length &&
+      !borderFilling.length
+    ) {
+      // Display an alert or toast message
+      alert("Panel filling layers data must not be empty");
+      return; // Prevent form submission
+    }
+
     // Update store fields with validated form values
     (Object.keys(values) as (keyof IFormStore)[]).forEach((key) =>
       updateField(key, values[key])
