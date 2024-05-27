@@ -1,19 +1,18 @@
 "use client";
 
 import {
-  Autocomplete,
+  Text,
   Group,
   Burger,
   rem,
   Container,
-  Box,
+  UnstyledButton,
+  useMantineTheme,
 } from "@mantine/core";
-import { IconSearch } from "@tabler/icons-react";
-import { MantineLogo } from "@mantinex/mantine-logo";
+import { IconBed } from "@tabler/icons-react";
 import classes from "./Header.module.css";
 import { useState } from "react";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 
 const links = [
   { link: "/", label: "Home" },
@@ -21,6 +20,7 @@ const links = [
 ];
 
 const Header = () => {
+  const theme = useMantineTheme();
   const [opened, setOpened] = useState(false);
   const [active, setActive] = useState(links[0].link);
 
@@ -41,7 +41,16 @@ const Header = () => {
   return (
     <header className={classes.header}>
       <Container px={0} size="97%" className={classes.inner}>
-        <MantineLogo size={28} />
+        <UnstyledButton
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: rem(10),
+          }}
+        >
+          <IconBed color={theme.colors.blue[6]} size="1.5rem" />
+          <Text size={"1rem"}>Durabed</Text>
+        </UnstyledButton>
         <Group gap={5} visibleFrom="xs">
           {items}
         </Group>
