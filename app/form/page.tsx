@@ -25,6 +25,7 @@ import {
 } from "@/constants/constants";
 
 import { IconX, IconCheck } from "@tabler/icons-react";
+import { createProduct } from "@/actions/product.actions";
 
 export default function Form() {
   const theme = useMantineTheme();
@@ -51,7 +52,6 @@ export default function Form() {
     panelFillingBottomLayer,
     borderFilling,
     updateField,
-    submitForm,
   } = useFormStore();
 
   const form = useForm({
@@ -106,6 +106,11 @@ export default function Form() {
     },
   });
 
+  const submitForm = (data: IFormStore) => {
+    console.log("Form data:", data);
+    createProduct(data);
+  };
+
   const handleSubmit = (values: any) => {
     // Check if panel filling data is empty
     if (
@@ -122,7 +127,7 @@ export default function Form() {
     (Object.keys(values) as (keyof IFormStore)[]).forEach((key) =>
       updateField(key, values[key])
     );
-    submitForm();
+    submitForm(values);
   };
 
   return (
