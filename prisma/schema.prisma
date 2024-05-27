@@ -1,0 +1,78 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+// Define the Product model
+model Product {
+  id                   Int              @id @default(autoincrement())
+  productName          String
+  productDetails       String
+  deliveryAddress      String
+  tickSupplier         String
+  tickQuality          String
+  tickNumberRef        String
+  tickColourRef        String
+  composition          String
+  issuedTo             String
+  dateRequired         DateTime
+  comments             String
+  labelType            String[]
+  springType           String[]
+  quiltType            String[]
+  accessories          String[]
+  patternNumber        String[]
+  borderType           String[]
+  borderDepth          String
+  topPanelFillings     TopPanelFilling[]
+  bottomPanelFillings  BottomPanelFilling[]
+  borderPanelFillings  BorderPanelFilling[]
+}
+
+// Define the TopPanelFilling model
+model TopPanelFilling {
+  id          Int      @id @default(autoincrement())
+  layer       String
+  description String
+  weight      Float
+  sizeWidth   Float
+  supplier    String
+  product     Product  @relation(fields: [productId], references: [id])
+  productId   Int
+}
+
+// Define the BottomPanelFilling model
+model BottomPanelFilling {
+  id          Int      @id @default(autoincrement())
+  layer       String
+  description String
+  weight      Float
+  sizeWidth   Float
+  supplier    String
+  product     Product  @relation(fields: [productId], references: [id])
+  productId   Int
+}
+
+// Define the BorderPanelFilling model
+model BorderPanelFilling {
+  id          Int      @id @default(autoincrement())
+  layer       String
+  description String
+  weight      Float
+  sizeWidth   Float
+  supplier    String
+  product     Product  @relation(fields: [productId], references: [id])
+  productId   Int
+}
+
