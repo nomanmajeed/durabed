@@ -12,7 +12,8 @@ import {
   rem,
   useMantineTheme,
 } from "@mantine/core";
-import useFormStore from "@/store/useFormStore";
+import { useForm } from "@mantine/form";
+import useFormStore, { IFormStore } from "@/store/useFormStore";
 import PanelFillingTable from "@/components/table/PanelFillingTable";
 import {
   LABEL_TYPE_DATA,
@@ -51,14 +52,69 @@ export default function Form() {
     submitForm,
   } = useFormStore();
 
+  const form = useForm({
+    initialValues: {
+      productName,
+      productDetails,
+      deliveryAddress,
+      tickSupplier,
+      tickQuality,
+      tickNumberRef,
+      tickColourRef,
+      composition,
+      issuedTo,
+      dateRequired,
+      comments,
+      labelType,
+      springType,
+      quiltType,
+      accessories,
+      patternNumber,
+      borderType,
+      borderDepth,
+    },
+    validate: {
+      productName: (value) => (value ? null : "Product Name is required"),
+      productDetails: (value) =>
+        value ? null : "Product Details are required",
+      deliveryAddress: (value) =>
+        value ? null : "Delivery Address is required",
+      tickSupplier: (value) => (value ? null : "Tick Supplier is required"),
+      tickQuality: (value) => (value ? null : "Tick Quality is required"),
+      tickNumberRef: (value) => (value ? null : "Tick Number/Ref is required"),
+      tickColourRef: (value) => (value ? null : "Tick Colour Ref is required"),
+      composition: (value) => (value ? null : "Composition is required"),
+      issuedTo: (value) => (value ? null : "Issued To is required"),
+      dateRequired: (value) =>
+        !value
+          ? "Date is required"
+          : !/^\d{2}\/\d{2}\/\d{4}$/.test(value)
+          ? "Date must be in the format DD/MM/YYYY"
+          : null,
+      comments: (value) => (value ? null : "Comments are required"),
+      labelType: (value) => (value.length ? null : "Label Type is required"),
+      springType: (value) => (value.length ? null : "Spring Type is required"),
+      quiltType: (value) => (value.length ? null : "Quilt Type is required"),
+      accessories: (value) =>
+        value.length ? null : "Accessories are required",
+      patternNumber: (value) =>
+        value.length ? null : "Pattern Number is required",
+      borderType: (value) => (value.length ? null : "Border Type is required"),
+      borderDepth: (value) => (value ? null : "Border Depth is required"),
+    },
+  });
+
+  const handleSubmit = (values: any) => {
+    // Update store fields with validated form values
+    (Object.keys(values) as (keyof IFormStore)[]).forEach((key) =>
+      updateField(key, values[key])
+    );
+    submitForm();
+  };
+
   return (
     <Box my="md">
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          submitForm();
-        }}
-      >
+      <form onSubmit={form.onSubmit(handleSubmit)}>
         <Fieldset
           legend="Product information"
           style={{
@@ -73,8 +129,7 @@ export default function Form() {
                 <TextInput
                   label="Product Name"
                   placeholder="Crystal"
-                  value={productName}
-                  onChange={(e) => updateField("productName", e.target.value)}
+                  {...form.getInputProps("productName")}
                 />
               </Grid.Col>
               <Grid.Col>
@@ -83,10 +138,7 @@ export default function Form() {
                   autosize
                   minRows={3}
                   maxRows={3}
-                  value={productDetails}
-                  onChange={(e) =>
-                    updateField("productDetails", e.target.value)
-                  }
+                  {...form.getInputProps("productDetails")}
                 />
               </Grid.Col>
               <Grid.Col>
@@ -95,10 +147,7 @@ export default function Form() {
                   autosize
                   minRows={3}
                   maxRows={3}
-                  value={deliveryAddress}
-                  onChange={(e) =>
-                    updateField("deliveryAddress", e.target.value)
-                  }
+                  {...form.getInputProps("deliveryAddress")}
                 />
               </Grid.Col>
             </Grid>
@@ -107,32 +156,28 @@ export default function Form() {
                 <TextInput
                   label="Tick Supplier"
                   placeholder="Original"
-                  value={tickSupplier}
-                  onChange={(e) => updateField("tickSupplier", e.target.value)}
+                  {...form.getInputProps("tickSupplier")}
                 />
               </Grid.Col>
               <Grid.Col>
                 <TextInput
                   label="Tick Quality"
                   placeholder="Knitted"
-                  value={tickQuality}
-                  onChange={(e) => updateField("tickQuality", e.target.value)}
+                  {...form.getInputProps("tickQuality")}
                 />
               </Grid.Col>
               <Grid.Col>
                 <TextInput
                   label="Tick Number/Ref"
                   placeholder="12345"
-                  value={tickNumberRef}
-                  onChange={(e) => updateField("tickNumberRef", e.target.value)}
+                  {...form.getInputProps("tickNumberRef")}
                 />
               </Grid.Col>
               <Grid.Col>
                 <TextInput
                   label="Tick Colour Ref"
                   placeholder="White"
-                  value={tickColourRef}
-                  onChange={(e) => updateField("tickColourRef", e.target.value)}
+                  {...form.getInputProps("tickColourRef")}
                 />
               </Grid.Col>
             </Grid>
@@ -143,24 +188,21 @@ export default function Form() {
                   autosize
                   minRows={4}
                   maxRows={4}
-                  value={composition}
-                  onChange={(e) => updateField("composition", e.target.value)}
+                  {...form.getInputProps("composition")}
                 />
               </Grid.Col>
               <Grid.Col>
                 <TextInput
                   label="Issued To"
                   placeholder="John Doe"
-                  value={issuedTo}
-                  onChange={(e) => updateField("issuedTo", e.target.value)}
+                  {...form.getInputProps("issuedTo")}
                 />
               </Grid.Col>
               <Grid.Col>
                 <TextInput
                   label="Date Required"
                   placeholder="16/12/2021"
-                  value={dateRequired}
-                  onChange={(e) => updateField("dateRequired", e.target.value)}
+                  {...form.getInputProps("dateRequired")}
                 />
               </Grid.Col>
             </Grid>
@@ -171,8 +213,7 @@ export default function Form() {
                   autosize
                   minRows={6}
                   maxRows={6}
-                  value={comments}
-                  onChange={(e) => updateField("comments", e.target.value)}
+                  {...form.getInputProps("comments")}
                 />
               </Grid.Col>
               <Grid.Col>
@@ -180,8 +221,7 @@ export default function Form() {
                   label="Label Type"
                   data={LABEL_TYPE_DATA}
                   searchable
-                  value={labelType}
-                  onChange={(values) => updateField("labelType", values)}
+                  {...form.getInputProps("labelType")}
                 />
               </Grid.Col>
             </Grid>
@@ -204,8 +244,7 @@ export default function Form() {
                   label="Spring Type"
                   data={MATTRESS_SPRING_TYPE_DATA}
                   searchable
-                  value={springType}
-                  onChange={(values) => updateField("springType", values)}
+                  {...form.getInputProps("springType")}
                 />
               </Grid.Col>
               <Grid.Col>
@@ -213,8 +252,7 @@ export default function Form() {
                   label="Quilt Type"
                   data={MATTRESS_QUILT_TYPE_DATA}
                   searchable
-                  value={quiltType}
-                  onChange={(values) => updateField("quiltType", values)}
+                  {...form.getInputProps("quiltType")}
                 />
               </Grid.Col>
             </Grid>
@@ -224,8 +262,7 @@ export default function Form() {
                   label="Accessories"
                   data={MATTRESS_ACCESSORIES_DATA}
                   searchable
-                  value={accessories}
-                  onChange={(values) => updateField("accessories", values)}
+                  {...form.getInputProps("accessories")}
                 />
               </Grid.Col>
               <Grid.Col>
@@ -233,8 +270,7 @@ export default function Form() {
                   label="Pattern No."
                   data={MATTRESS_PATTERN_NUMBER_DATA}
                   searchable
-                  value={patternNumber}
-                  onChange={(values) => updateField("patternNumber", values)}
+                  {...form.getInputProps("patternNumber")}
                 />
               </Grid.Col>
             </Grid>
@@ -244,16 +280,14 @@ export default function Form() {
                   label="Border"
                   data={MATTRESS_BORDER_DATA}
                   searchable
-                  value={borderType}
-                  onChange={(values) => updateField("borderType", values)}
+                  {...form.getInputProps("borderType")}
                 />
               </Grid.Col>
               <Grid.Col>
                 <TextInput
                   label="Border Depth"
                   placeholder="9.5 inches"
-                  value={borderDepth}
-                  onChange={(e) => updateField("borderDepth", e.target.value)}
+                  {...form.getInputProps("borderDepth")}
                 />
               </Grid.Col>
             </Grid>
