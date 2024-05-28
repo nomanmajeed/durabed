@@ -12,6 +12,8 @@ import {
   rem,
   keys,
   useMantineTheme,
+  Box,
+  Loader,
 } from "@mantine/core";
 import {
   IconSelector,
@@ -20,7 +22,8 @@ import {
   IconSearch,
 } from "@tabler/icons-react";
 import classes from "./ProductTable.module.css";
-import { getProducts } from "@/actions/product.actions";
+import { deleteProduct, getProducts } from "@/actions/product.actions";
+import { NotFoundTitle } from "@/components/NotFound/NotFound";
 
 interface RowData {
   id: number;
@@ -134,8 +137,10 @@ export function ProductTable() {
   const fetchData = async () => {
     try {
       const result: any = await getProducts();
-      setData(result);
-      setSortedData(result);
+      if (result) {
+        setData(result);
+        setSortedData(result);
+      }
       setLoading(false);
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -177,7 +182,7 @@ export function ProductTable() {
           <UnstyledButton>
             <Text color={theme.colors.blue[6]}>Edit</Text>
           </UnstyledButton>
-          <UnstyledButton>
+          <UnstyledButton onClick={() => deleteProduct(row.id)}>
             <Text color={theme.colors.red[6]}>Delete</Text>
           </UnstyledButton>
         </Group>
@@ -186,11 +191,21 @@ export function ProductTable() {
   ));
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <Box
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Loader color="blue" size="sm" />
+      </Box>
+    );
   }
 
   if (error) {
-    return <div>{error}</div>;
+    return <NotFoundTitle />;
   }
 
   return (
@@ -206,7 +221,7 @@ export function ProductTable() {
         placeholder="Search by any field"
         w={"30%"}
         mb="md"
-        ml="md"
+        ml="sm"
         leftSection={
           <IconSearch
             style={{ width: rem(16), height: rem(16) }}
@@ -281,8 +296,10 @@ export function ProductTable() {
             rows
           ) : (
             <Table.Tr>
-              <Table.Td colSpan={Object.keys(data[0]).length}>
-                <Text fw={500} ta="center">
+              <Table.Td
+                colSpan={data.length > 0 ? Object.keys(data[0]).length : 12}
+              >
+                <Text fw={500} ta="center" mt="xl">
                   Nothing found
                 </Text>
               </Table.Td>
