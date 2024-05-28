@@ -1,7 +1,10 @@
+import { ProductTable } from "@/components/table/productTable/ProductTable";
+import { Box, rem } from "@mantine/core";
+
 export default function Home() {
   return (
-    <div>
-      <h1>HOME</h1>
-    </div>
+    <Box>
+      <ProductTable />
+    </Box>
   );
 }
