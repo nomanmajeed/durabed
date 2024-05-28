@@ -123,16 +123,16 @@ export default function Form() {
       return; // Prevent form submission
     }
 
-    // Update store fields with validated form values
-    (Object.keys(values) as (keyof IFormStore)[]).forEach((key) =>
-      updateField(key, values[key])
-    );
+    // // Update store fields with validated form values
+    // (Object.keys(values) as (keyof IFormStore)[]).forEach((key) =>
+    //   updateField(key, values[key])
+    // );
     submitForm(values);
   };
 
   return (
     <Box my="md">
-      <form onSubmit={form.onSubmit(handleSubmit)}>
+      <form onSubmit={handleSubmit}>
         <Fieldset
           legend="Product information"
           style={{
