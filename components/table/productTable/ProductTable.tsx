@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import {
   Table,
   ScrollArea,
@@ -20,15 +20,28 @@ import {
   IconSearch,
 } from "@tabler/icons-react";
 import classes from "./ProductTable.module.css";
+import { getProducts } from "@/actions/product.actions";
 
 interface RowData {
+  id: number;
   productName: string;
+  productDetails: string;
+  deliveryAddress: string;
   tickSupplier: string;
   tickQuality: string;
   tickNumberRef: string;
-  tickColorRef: string;
+  tickColourRef: string;
+  composition: string;
   issuedTo: string;
   dateRequired: string;
+  comments: string;
+  labelType: string[];
+  springType: string[];
+  quiltType: string[];
+  accessories: string[];
+  patternNumber: string[];
+  borderType: string[];
+  borderDepth: string;
 }
 
 interface ThProps {
@@ -64,8 +77,16 @@ function Th({ children, reversed, sorted, onSort }: ThProps) {
 
 function filterData(data: RowData[], search: string) {
   const query = search.toLowerCase().trim();
-  return data.filter((item) =>
-    keys(data[0]).some((key) => item[key].toLowerCase().includes(query))
+  return data.filter(({ id, ...item }) =>
+    (Object.keys(item) as (keyof typeof item)[]).some((key) => {
+      const value = item[key];
+      if (typeof value === "string") {
+        return value.toLowerCase().includes(query);
+      } else if (Array.isArray(value)) {
+        return value.some((v) => v.toLowerCase().includes(query));
+      }
+      return false;
+    })
   );
 }
 
@@ -81,34 +102,51 @@ function sortData(
 
   return filterData(
     [...data].sort((a, b) => {
-      if (payload.reversed) {
-        return b[sortBy].localeCompare(a[sortBy]);
+      const aValue = a[sortBy];
+      const bValue = b[sortBy];
+
+      if (typeof aValue === "string" && typeof bValue === "string") {
+        return payload.reversed
+          ? bValue.localeCompare(aValue)
+          : aValue.localeCompare(bValue);
       }
 
-      return a[sortBy].localeCompare(b[sortBy]);
+      if (typeof aValue === "number" && typeof bValue === "number") {
+        return payload.reversed ? bValue - aValue : aValue - bValue;
+      }
+
+      return 0; // Handle cases where the types are mixed or arrays
     }),
     payload.search
   );
 }
 
-const data = [
-  {
-    productName: "Athena Weissnat",
-    tickSupplier: "Little - Rippin",
-    tickQuality: "Handcrafted",
-    tickNumberRef: "Elouise.Prohaska@yahoo.com",
-    tickColorRef: "No Label",
-    issuedTo: "Centre",
-    dateRequired: "23/12/2021",
-  },
-];
-
 export function ProductTable() {
   const theme = useMantineTheme();
   const [search, setSearch] = useState("");
-  const [sortedData, setSortedData] = useState(data);
+  const [data, setData] = useState<RowData[]>([]);
+  const [sortedData, setSortedData] = useState<RowData[]>([]);
   const [sortBy, setSortBy] = useState<keyof RowData | null>(null);
   const [reverseSortDirection, setReverseSortDirection] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchData = async () => {
+    try {
+      const result: any = await getProducts();
+      setData(result);
+      setSortedData(result);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      setError("Failed to load products");
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const setSorting = (field: keyof RowData) => {
     const reversed = field === sortBy ? !reverseSortDirection : false;
@@ -131,11 +169,29 @@ export function ProductTable() {
       <Table.Td>{row.tickSupplier}</Table.Td>
       <Table.Td>{row.tickQuality}</Table.Td>
       <Table.Td>{row.tickNumberRef}</Table.Td>
-      <Table.Td>{row.tickColorRef}</Table.Td>
+      <Table.Td>{row.tickColourRef}</Table.Td>
       <Table.Td>{row.issuedTo}</Table.Td>
       <Table.Td>{row.dateRequired}</Table.Td>
+      <Table.Td>
+        <Group>
+          <UnstyledButton>
+            <Text color={theme.colors.blue[6]}>Edit</Text>
+          </UnstyledButton>
+          <UnstyledButton>
+            <Text color={theme.colors.red[6]}>Delete</Text>
+          </UnstyledButton>
+        </Group>
+      </Table.Td>
     </Table.Tr>
   ));
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
 
   return (
     <ScrollArea
@@ -164,9 +220,7 @@ export function ProductTable() {
         horizontalSpacing="md"
         verticalSpacing="xs"
         miw={700}
-        layout="fixed"
         striped={"even"}
-        highlightOnHover
       >
         <Table.Tbody>
           <Table.Tr>
@@ -199,9 +253,9 @@ export function ProductTable() {
               Tick Number Ref
             </Th>
             <Th
-              sorted={sortBy === "tickColorRef"}
+              sorted={sortBy === "tickColourRef"}
               reversed={reverseSortDirection}
-              onSort={() => setSorting("tickColorRef")}
+              onSort={() => setSorting("tickColourRef")}
             >
               Tick Color Ref
             </Th>
