@@ -15,11 +15,13 @@
     "@mantine/form": "^7.9.1",
     "@mantine/hooks": "^7.9.1",
     "@mantine/modals": "^7.9.1",
+    "@mantine/notifications": "^7.10.0",
     "@prisma/client": "^5.14.0",
     "date-fns": "^3.6.0",
     "next": "14.2.3",
     "react": "^18",
     "react-dom": "^18",
+    "react-toastify": "^10.0.5",
     "zustand": "^4.5.2"
   },
   "devDependencies": {

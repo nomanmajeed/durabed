@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   Table,
   ScrollArea,
@@ -10,7 +10,6 @@ import {
   Center,
   TextInput,
   rem,
-  keys,
   useMantineTheme,
   Box,
   Loader,
@@ -24,6 +23,8 @@ import {
 import classes from "./ProductTable.module.css";
 import { deleteProduct, getProducts } from "@/actions/product.actions";
 import { NotFoundTitle } from "@/components/NotFound/NotFound";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 interface RowData {
   id: number;
@@ -182,7 +183,14 @@ export function ProductTable() {
           <UnstyledButton>
             <Text color={theme.colors.blue[6]}>Edit</Text>
           </UnstyledButton>
-          <UnstyledButton onClick={() => deleteProduct(row.id)}>
+          <UnstyledButton
+            onClick={() => {
+              console.log("Delete product", row.id);
+              deleteProduct(row.id);
+              fetchData();
+              toast.success(`Product ${row.productName} deleted successfully`);
+            }}
+          >
             <Text color={theme.colors.red[6]}>Delete</Text>
           </UnstyledButton>
         </Group>
@@ -190,123 +198,127 @@ export function ProductTable() {
     </Table.Tr>
   ));
 
-  if (loading) {
-    return (
-      <Box
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <Loader color="blue" size="sm" />
-      </Box>
-    );
-  }
+  //   if (loading) {
+  //     return (
+  //       <Box
+  //         style={{
+  //           display: "flex",
+  //           justifyContent: "center",
+  //           alignItems: "center",
+  //         }}
+  //       >
+  //         <Loader color="blue" size="sm" />
+  //       </Box>
+  //     );
+  //   }
 
   if (error) {
     return <NotFoundTitle />;
   }
 
   return (
-    <ScrollArea
-      style={{
-        padding: rem(30),
-        border: "1px solid " + theme.colors.gray[4],
-        borderRadius: rem(30),
-        height: "calc(100vh - 120px)",
-      }}
-    >
-      <TextInput
-        placeholder="Search by any field"
-        w={"30%"}
-        mb="md"
-        ml="sm"
-        leftSection={
-          <IconSearch
-            style={{ width: rem(16), height: rem(16) }}
-            stroke={1.5}
-          />
-        }
-        value={search}
-        onChange={handleSearchChange}
-      />
-      <Table
-        horizontalSpacing="md"
-        verticalSpacing="xs"
-        miw={700}
-        striped={"even"}
+    <>
+      <ToastContainer />
+
+      <ScrollArea
+        style={{
+          padding: rem(30),
+          border: "1px solid " + theme.colors.gray[4],
+          borderRadius: rem(30),
+          height: "calc(100vh - 120px)",
+        }}
       >
-        <Table.Tbody>
-          <Table.Tr>
-            <Th
-              sorted={sortBy === "productName"}
-              reversed={reverseSortDirection}
-              onSort={() => setSorting("productName")}
-            >
-              Product Name
-            </Th>
-            <Th
-              sorted={sortBy === "tickSupplier"}
-              reversed={reverseSortDirection}
-              onSort={() => setSorting("tickSupplier")}
-            >
-              Tick Supplier
-            </Th>
-            <Th
-              sorted={sortBy === "tickQuality"}
-              reversed={reverseSortDirection}
-              onSort={() => setSorting("tickQuality")}
-            >
-              Tick Quality
-            </Th>
-            <Th
-              sorted={sortBy === "tickNumberRef"}
-              reversed={reverseSortDirection}
-              onSort={() => setSorting("tickNumberRef")}
-            >
-              Tick Number Ref
-            </Th>
-            <Th
-              sorted={sortBy === "tickColourRef"}
-              reversed={reverseSortDirection}
-              onSort={() => setSorting("tickColourRef")}
-            >
-              Tick Color Ref
-            </Th>
-            <Th
-              sorted={sortBy === "issuedTo"}
-              reversed={reverseSortDirection}
-              onSort={() => setSorting("issuedTo")}
-            >
-              Issued To
-            </Th>
-            <Th
-              sorted={sortBy === "dateRequired"}
-              reversed={reverseSortDirection}
-              onSort={() => setSorting("dateRequired")}
-            >
-              Date Required
-            </Th>
-            <Th>Actions</Th>
-          </Table.Tr>
-        </Table.Tbody>
-        <Table.Tbody>
-          {rows.length > 0 ? (
-            rows
-          ) : (
+        <TextInput
+          placeholder="Search by any field"
+          w={"30%"}
+          mb="md"
+          ml="sm"
+          leftSection={
+            <IconSearch
+              style={{ width: rem(16), height: rem(16) }}
+              stroke={1.5}
+            />
+          }
+          value={search}
+          onChange={handleSearchChange}
+        />
+        <Table
+          horizontalSpacing="md"
+          verticalSpacing="xs"
+          miw={700}
+          striped={"even"}
+        >
+          <Table.Tbody>
             <Table.Tr>
-              <Table.Td
-                colSpan={data.length > 0 ? Object.keys(data[0]).length : 12}
+              <Th
+                sorted={sortBy === "productName"}
+                reversed={reverseSortDirection}
+                onSort={() => setSorting("productName")}
               >
-                <Text fw={500} ta="center" mt="xl">
-                  Nothing found
-                </Text>
-              </Table.Td>
+                Product Name
+              </Th>
+              <Th
+                sorted={sortBy === "tickSupplier"}
+                reversed={reverseSortDirection}
+                onSort={() => setSorting("tickSupplier")}
+              >
+                Tick Supplier
+              </Th>
+              <Th
+                sorted={sortBy === "tickQuality"}
+                reversed={reverseSortDirection}
+                onSort={() => setSorting("tickQuality")}
+              >
+                Tick Quality
+              </Th>
+              <Th
+                sorted={sortBy === "tickNumberRef"}
+                reversed={reverseSortDirection}
+                onSort={() => setSorting("tickNumberRef")}
+              >
+                Tick Number Ref
+              </Th>
+              <Th
+                sorted={sortBy === "tickColourRef"}
+                reversed={reverseSortDirection}
+                onSort={() => setSorting("tickColourRef")}
+              >
+                Tick Color Ref
+              </Th>
+              <Th
+                sorted={sortBy === "issuedTo"}
+                reversed={reverseSortDirection}
+                onSort={() => setSorting("issuedTo")}
+              >
+                Issued To
+              </Th>
+              <Th
+                sorted={sortBy === "dateRequired"}
+                reversed={reverseSortDirection}
+                onSort={() => setSorting("dateRequired")}
+              >
+                Date Required
+              </Th>
+              <Th>Actions</Th>
             </Table.Tr>
-          )}
-        </Table.Tbody>
-      </Table>
-    </ScrollArea>
+          </Table.Tbody>
+          <Table.Tbody>
+            {rows.length > 0 ? (
+              rows
+            ) : (
+              <Table.Tr>
+                <Table.Td
+                  colSpan={data.length > 0 ? Object.keys(data[0]).length : 12}
+                >
+                  <Text fw={500} ta="center" mt="xl">
+                    Nothing found
+                  </Text>
+                </Table.Td>
+              </Table.Tr>
+            )}
+          </Table.Tbody>
+        </Table>
+      </ScrollArea>
+    </>
   );
 }
