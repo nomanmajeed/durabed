@@ -24,11 +24,13 @@ import {
   MATTRESS_SPRING_TYPE_DATA,
 } from "@/constants/constants";
 
-import { IconX, IconCheck } from "@tabler/icons-react";
 import { createProduct } from "@/actions/product.actions";
+import { useRouter } from "next/navigation";
 
 export default function Form() {
   const theme = useMantineTheme();
+  const router = useRouter();
+
   const {
     productName,
     productDetails,
@@ -112,27 +114,31 @@ export default function Form() {
   };
 
   const handleSubmit = (values: any) => {
-    // Check if panel filling data is empty
+    // Ensure this logic only runs for the main form submission
     if (
       !panelFillingTopLayer.length &&
       !panelFillingBottomLayer.length &&
       !borderFilling.length
     ) {
-      // Display an alert or toast message
       alert("Panel filling layers data must not be empty");
       return; // Prevent form submission
     }
 
-    // // Update store fields with validated form values
-    // (Object.keys(values) as (keyof IFormStore)[]).forEach((key) =>
-    //   updateField(key, values[key])
-    // );
+    // Update store fields with validated form values
+    (Object.keys(values) as (keyof IFormStore)[]).forEach((key) =>
+      updateField(key, values[key])
+    );
     submitForm(values);
   };
 
   return (
     <Box my="md">
-      <form onSubmit={handleSubmit}>
+      <form
+        onSubmit={(event) => {
+          event.preventDefault(); // Prevent the default form submission
+          form.onSubmit(handleSubmit)(event);
+        }}
+      >
         <Fieldset
           legend="Product information"
           style={{
