@@ -13,6 +13,7 @@ import {
   useMantineTheme,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
+import { useRouter } from "next/navigation"; // Import useRouter
 import useFormStore, { IFormStore } from "@/store/useFormStore";
 import PanelFillingTable from "@/components/table/PanelFillingTable";
 import {
@@ -25,12 +26,10 @@ import {
 } from "@/constants/constants";
 
 import { createProduct } from "@/actions/product.actions";
-import { useRouter } from "next/navigation";
 
 export default function Form() {
   const theme = useMantineTheme();
-  const router = useRouter();
-
+  const router = useRouter(); // Initialize useRouter
   const {
     productName,
     productDetails,
@@ -108,9 +107,13 @@ export default function Form() {
     },
   });
 
-  const submitForm = (data: IFormStore) => {
-    console.log("Form data:", data);
-    createProduct(data);
+  const submitForm = async (data: IFormStore) => {
+    try {
+      await createProduct(data);
+      router.push("/"); // Navigate to the homepage on success
+    } catch (error) {
+      console.error("Failed to create product:", error);
+    }
   };
 
   const handleSubmit = (values: any) => {
