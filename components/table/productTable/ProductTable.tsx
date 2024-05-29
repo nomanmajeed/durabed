@@ -25,6 +25,7 @@ import { deleteProduct, getProducts } from "@/actions/product.actions";
 import { NotFoundTitle } from "@/components/NotFound/NotFound";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useRouter } from "next/navigation";
 
 interface RowData {
   id: number;
@@ -127,6 +128,8 @@ function sortData(
 
 export function ProductTable() {
   const theme = useMantineTheme();
+  const router = useRouter();
+
   const [search, setSearch] = useState("");
   const [data, setData] = useState<RowData[]>([]);
   const [sortedData, setSortedData] = useState<RowData[]>([]);
@@ -148,6 +151,11 @@ export function ProductTable() {
       setError("Failed to load products");
       setLoading(false);
     }
+  };
+
+  const handleEditClick = (id: any) => {
+    // If you need to pass an ID or some parameter, you can use query params or dynamic routes
+    router.push(`/form?id=${id}`);
   };
 
   useEffect(() => {
@@ -180,7 +188,7 @@ export function ProductTable() {
       <Table.Td>{row.dateRequired}</Table.Td>
       <Table.Td>
         <Group>
-          <UnstyledButton>
+          <UnstyledButton onClick={() => handleEditClick(row.id)}>
             <Text color={theme.colors.blue[6]}>Edit</Text>
           </UnstyledButton>
           <UnstyledButton

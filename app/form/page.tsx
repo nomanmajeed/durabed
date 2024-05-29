@@ -11,9 +11,10 @@ import {
   Textarea,
   rem,
   useMantineTheme,
+  LoadingOverlay,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { useRouter } from "next/navigation"; // Import useRouter
+import { useRouter, useSearchParams } from "next/navigation";
 import useFormStore, { IFormStore } from "@/store/useFormStore";
 import PanelFillingTable from "@/components/table/PanelFillingTable";
 import {
@@ -25,11 +26,18 @@ import {
   MATTRESS_SPRING_TYPE_DATA,
 } from "@/constants/constants";
 
-import { createProduct } from "@/actions/product.actions";
+import { createProduct, getProduct } from "@/actions/product.actions";
+import { useEffect, useState } from "react";
+import { showNotification } from "@mantine/notifications";
 
 export default function Form() {
   const theme = useMantineTheme();
-  const router = useRouter(); // Initialize useRouter
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
+
+  const [loading, setLoading] = useState(false);
+
   const {
     productName,
     productDetails,
@@ -107,12 +115,91 @@ export default function Form() {
     },
   });
 
+  useEffect(() => {
+    if (id) {
+      setLoading(true); // Start loading
+      const productId = Number(id);
+
+      const fetchProduct = async () => {
+        try {
+          const productDetails = await getProduct(productId);
+
+          if (productDetails) {
+            form.setValues({
+              productName: productDetails.productName || "",
+              productDetails: productDetails.productDetails || "",
+              deliveryAddress: productDetails.deliveryAddress || "",
+              tickSupplier: productDetails.tickSupplier || "",
+              tickQuality: productDetails.tickQuality || "",
+              tickNumberRef: productDetails.tickNumberRef || "",
+              tickColourRef: productDetails.tickColourRef || "",
+              composition: productDetails.composition || "",
+              issuedTo: productDetails.issuedTo || "",
+              dateRequired: productDetails.dateRequired || "",
+              comments: productDetails.comments || "",
+              labelType: productDetails.labelType || [],
+              springType: productDetails.springType || [],
+              quiltType: productDetails.quiltType || [],
+              accessories: productDetails.accessories || [],
+              patternNumber: productDetails.patternNumber || [],
+              borderType: productDetails.borderType || [],
+              borderDepth: productDetails.borderDepth || "",
+            });
+            // Update panel fillings data in the store
+            updateField(
+              "panelFillingTopLayer",
+              productDetails.topPanelFillings
+            );
+            updateField(
+              "panelFillingBottomLayer",
+              productDetails.bottomPanelFillings
+            );
+            updateField("borderFilling", productDetails.borderPanelFillings);
+          } else {
+            showNotification({
+              title: "Error",
+              message: "Product not found.",
+              color: "red",
+            });
+          }
+
+          setLoading(false); // End loading
+        } catch (error) {
+          console.error("Failed to fetch product details:", error);
+          showNotification({
+            title: "Error",
+            message: "Failed to fetch product details.",
+            color: "red",
+          });
+          setLoading(false); // End loading
+        }
+      };
+
+      fetchProduct();
+    }
+  }, [id]);
+
   const submitForm = async (data: IFormStore) => {
     try {
-      await createProduct(data);
+      await createProduct({
+        ...data,
+        panelFillingTopLayer,
+        panelFillingBottomLayer,
+        borderFilling,
+      });
+      showNotification({
+        title: "Success",
+        message: "Product created successfully!",
+        color: "green",
+      });
       router.push("/"); // Navigate to the homepage on success
     } catch (error) {
       console.error("Failed to create product:", error);
+      showNotification({
+        title: "Error",
+        message: "Failed to create product.",
+        color: "red",
+      });
     }
   };
 
@@ -136,6 +223,7 @@ export default function Form() {
 
   return (
     <Box my="md">
+      <LoadingOverlay visible={loading} />
       <form
         onSubmit={(event) => {
           event.preventDefault(); // Prevent the default form submission
