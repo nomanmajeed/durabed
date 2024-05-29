@@ -11,8 +11,9 @@ import {
 } from "@mantine/core";
 import { IconBed } from "@tabler/icons-react";
 import classes from "./Header.module.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const links = [
   { link: "/", label: "Home" },
@@ -21,8 +22,14 @@ const links = [
 
 const Header = () => {
   const theme = useMantineTheme();
+  const pathname = usePathname();
+
   const [opened, setOpened] = useState(false);
-  const [active, setActive] = useState(links[0].link);
+  const [active, setActive] = useState(pathname);
+
+  useEffect(() => {
+    setActive(pathname);
+  }, [pathname]);
 
   const items = links.map((link, index) => (
     <Link key={index} href={`${link.link}`}>
