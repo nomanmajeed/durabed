@@ -10,6 +10,7 @@ import {
   TextInput,
   Modal,
   useMantineTheme,
+  NumberInput,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import useFormStore, { IFormStore, IPanelFilling } from "@/store/useFormStore";
@@ -182,12 +183,12 @@ const PanelFillingTable: React.FC<PanelFillingTableProps> = ({
             {...form.getInputProps("description")}
             mb="xs"
           />
-          <TextInput
+          <NumberInput
             placeholder="Weight"
             {...form.getInputProps("weight")}
             mb="xs"
           />
-          <TextInput
+          <NumberInput
             placeholder="Size/Width"
             {...form.getInputProps("sizeWidth")}
             mb="xs"
