@@ -27,7 +27,11 @@ import {
   MATTRESS_SPRING_TYPE_DATA,
 } from "@/constants/constants";
 
-import { createProduct, getProduct } from "@/actions/product.actions";
+import {
+  createProduct,
+  getProduct,
+  updateProduct,
+} from "@/actions/product.actions";
 import { useEffect, useState } from "react";
 import { showNotification } from "@mantine/notifications";
 
@@ -182,23 +186,37 @@ export default function Form() {
 
   const submitForm = async (data: IFormStore) => {
     try {
-      await createProduct({
-        ...data,
-        panelFillingTopLayer,
-        panelFillingBottomLayer,
-        borderFilling,
-      });
-      showNotification({
-        title: "Success",
-        message: "Product created successfully!",
-        color: "green",
-      });
+      if (id) {
+        await updateProduct(Number(id), {
+          ...data,
+          panelFillingTopLayer,
+          panelFillingBottomLayer,
+          borderFilling,
+        });
+        showNotification({
+          title: "Success",
+          message: "Product updated successfully!",
+          color: "green",
+        });
+      } else {
+        await createProduct({
+          ...data,
+          panelFillingTopLayer,
+          panelFillingBottomLayer,
+          borderFilling,
+        });
+        showNotification({
+          title: "Success",
+          message: "Product created successfully!",
+          color: "green",
+        });
+      }
       router.push("/"); // Navigate to the homepage on success
     } catch (error) {
-      console.error("Failed to create product:", error);
+      console.error(`Failed to ${id ? "update" : "create"} product:`, error);
       showNotification({
         title: "Error",
-        message: "Failed to create product.",
+        message: `Failed to ${id ? "update" : "create"} product.`,
         color: "red",
       });
     }
@@ -436,7 +454,7 @@ export default function Form() {
           }}
         >
           <Button variant="subtle" size="sm" type="submit">
-            Submit
+            {id ? "Update" : "Submit"}
           </Button>
         </Box>
       </form>
