@@ -10,6 +10,7 @@ import {
   TextInput,
   Modal,
   useMantineTheme,
+  NumberInput,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import useFormStore, { IFormStore, IPanelFilling } from "@/store/useFormStore";
@@ -49,7 +50,13 @@ const PanelFillingTable: React.FC<PanelFillingTableProps> = ({
     },
   });
 
-  const handleAddLayer = (values: typeof form.values) => {
+  const handleAddLayer = (
+    values: typeof form.values,
+    event: React.FormEvent
+  ) => {
+    event.preventDefault(); // Prevent default form submission
+    event.stopPropagation(); // Stop the event from propagating to the parent form
+
     updatePanelFilling(formField, [...data, values]);
     form.reset();
     setModalOpened(false); // Close the modal after adding the layer
@@ -160,7 +167,11 @@ const PanelFillingTable: React.FC<PanelFillingTableProps> = ({
         onClose={() => setModalOpened(false)}
         title="Add New Layer"
       >
-        <form onSubmit={form.onSubmit(handleAddLayer)}>
+        <form
+          onSubmit={(event) =>
+            form.onSubmit((values) => handleAddLayer(values, event))(event)
+          }
+        >
           <TextInput
             placeholder="Layer"
             disabled
@@ -172,12 +183,12 @@ const PanelFillingTable: React.FC<PanelFillingTableProps> = ({
             {...form.getInputProps("description")}
             mb="xs"
           />
-          <TextInput
+          <NumberInput
             placeholder="Weight"
             {...form.getInputProps("weight")}
             mb="xs"
           />
-          <TextInput
+          <NumberInput
             placeholder="Size/Width"
             {...form.getInputProps("sizeWidth")}
             mb="xs"

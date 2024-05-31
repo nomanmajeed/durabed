@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import {
@@ -11,8 +12,10 @@ import {
   Textarea,
   rem,
   useMantineTheme,
+  LoadingOverlay,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
+import { useRouter, useSearchParams } from "next/navigation";
 import useFormStore, { IFormStore } from "@/store/useFormStore";
 import PanelFillingTable from "@/components/table/PanelFillingTable";
 import {
@@ -24,10 +27,22 @@ import {
   MATTRESS_SPRING_TYPE_DATA,
 } from "@/constants/constants";
 
-import { IconX, IconCheck } from "@tabler/icons-react";
+import {
+  createProduct,
+  getProduct,
+  updateProduct,
+} from "@/actions/product.actions";
+import { useEffect, useState } from "react";
+import { showNotification } from "@mantine/notifications";
 
 export default function Form() {
   const theme = useMantineTheme();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
+
+  const [loading, setLoading] = useState(false);
+
   const {
     productName,
     productDetails,
@@ -51,7 +66,6 @@ export default function Form() {
     panelFillingBottomLayer,
     borderFilling,
     updateField,
-    submitForm,
   } = useFormStore();
 
   const form = useForm({
@@ -106,14 +120,115 @@ export default function Form() {
     },
   });
 
+  useEffect(() => {
+    if (id) {
+      setLoading(true); // Start loading
+      const productId = Number(id);
+
+      const fetchProduct = async () => {
+        try {
+          const productDetails = await getProduct(productId);
+
+          if (productDetails) {
+            form.setValues({
+              productName: productDetails.productName || "",
+              productDetails: productDetails.productDetails || "",
+              deliveryAddress: productDetails.deliveryAddress || "",
+              tickSupplier: productDetails.tickSupplier || "",
+              tickQuality: productDetails.tickQuality || "",
+              tickNumberRef: productDetails.tickNumberRef || "",
+              tickColourRef: productDetails.tickColourRef || "",
+              composition: productDetails.composition || "",
+              issuedTo: productDetails.issuedTo || "",
+              dateRequired: productDetails.dateRequired || "",
+              comments: productDetails.comments || "",
+              labelType: productDetails.labelType || [],
+              springType: productDetails.springType || [],
+              quiltType: productDetails.quiltType || [],
+              accessories: productDetails.accessories || [],
+              patternNumber: productDetails.patternNumber || [],
+              borderType: productDetails.borderType || [],
+              borderDepth: productDetails.borderDepth || "",
+            });
+            // Update panel fillings data in the store
+            updateField(
+              "panelFillingTopLayer",
+              productDetails.topPanelFillings
+            );
+            updateField(
+              "panelFillingBottomLayer",
+              productDetails.bottomPanelFillings
+            );
+            updateField("borderFilling", productDetails.borderPanelFillings);
+          } else {
+            showNotification({
+              title: "Error",
+              message: "Product not found.",
+              color: "red",
+            });
+          }
+
+          setLoading(false); // End loading
+        } catch (error) {
+          console.error("Failed to fetch product details:", error);
+          showNotification({
+            title: "Error",
+            message: "Failed to fetch product details.",
+            color: "red",
+          });
+          setLoading(false); // End loading
+        }
+      };
+
+      fetchProduct();
+    }
+  }, [id]);
+
+  const submitForm = async (data: IFormStore) => {
+    try {
+      if (id) {
+        await updateProduct(Number(id), {
+          ...data,
+          panelFillingTopLayer,
+          panelFillingBottomLayer,
+          borderFilling,
+        });
+        showNotification({
+          title: "Success",
+          message: "Product updated successfully!",
+          color: "green",
+        });
+      } else {
+        await createProduct({
+          ...data,
+          panelFillingTopLayer,
+          panelFillingBottomLayer,
+          borderFilling,
+        });
+        showNotification({
+          title: "Success",
+          message: "Product created successfully!",
+          color: "green",
+        });
+      }
+      router.push("/"); // Navigate to the homepage on success
+    } catch (error) {
+      console.error(`Failed to ${id ? "update" : "create"} product:`, error);
+      showNotification({
+        title: "Error",
+        message: `Failed to ${id ? "update" : "create"} product.`,
+        color: "red",
+      });
+    }
+  };
+
   const handleSubmit = (values: any) => {
-    // Check if panel filling data is empty
+    // Ensure this logic only runs for the main form submission
     if (
       !panelFillingTopLayer.length &&
       !panelFillingBottomLayer.length &&
       !borderFilling.length
     ) {
-      // Display an alert or toast message
       alert("Panel filling layers data must not be empty");
       return; // Prevent form submission
     }
@@ -122,12 +237,18 @@ export default function Form() {
     (Object.keys(values) as (keyof IFormStore)[]).forEach((key) =>
       updateField(key, values[key])
     );
-    submitForm();
+    submitForm(values);
   };
 
   return (
     <Box my="md">
-      <form onSubmit={form.onSubmit(handleSubmit)}>
+      <LoadingOverlay visible={loading} />
+      <form
+        onSubmit={(event) => {
+          event.preventDefault(); // Prevent the default form submission
+          form.onSubmit(handleSubmit)(event);
+        }}
+      >
         <Fieldset
           legend="Product information"
           style={{
@@ -333,7 +454,7 @@ export default function Form() {
           }}
         >
           <Button variant="subtle" size="sm" type="submit">
-            Submit
+            {id ? "Update" : "Submit"}
           </Button>
         </Box>
       </form>
