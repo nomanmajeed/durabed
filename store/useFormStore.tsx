@@ -1,4 +1,3 @@
-import { createProduct } from "@/actions/product.actions";
 import create from "zustand";
 
 export interface IPanelFilling {
@@ -33,7 +32,6 @@ export interface IFormStore {
   borderFilling: IPanelFilling[];
   updateField: (field: keyof IFormStore, value: any) => void;
   updatePanelFilling: (field: keyof IFormStore, data: IPanelFilling[]) => void;
-  // submitForm: () => void;
 }
 
 const useFormStore = create<IFormStore>((set) => ({
@@ -61,14 +59,6 @@ const useFormStore = create<IFormStore>((set) => ({
   updateField: (field, value) => set((state) => ({ ...state, [field]: value })),
   updatePanelFilling: (field, data) =>
     set((state) => ({ ...state, [field]: data })),
-  // submitForm: () => {
-  //   set((state) => {
-  //     console.log("Form data:", state);
-  //     createProduct(state);
-  //     // Add your submit logic here
-  //     return state; // Ensure the function returns the state
-  //   });
-  // },
 }));
 
 export default useFormStore;
