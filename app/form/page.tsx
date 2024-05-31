@@ -32,10 +32,10 @@ import {
   getProduct,
   updateProduct,
 } from "@/actions/product.actions";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { showNotification } from "@mantine/notifications";
 
-export default function Form() {
+function FormComponent() {
   const theme = useMantineTheme();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -459,5 +459,13 @@ export default function Form() {
         </Box>
       </form>
     </Box>
+  );
+}
+
+export default function Form() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <FormComponent />
+    </Suspense>
   );
 }
