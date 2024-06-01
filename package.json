@@ -32,12 +32,12 @@
     "zustand": "^4.5.2",
     "postcss": "^8.4.38",
     "postcss-simple-vars": "^7.0.1",
-    "postcss-preset-mantine": "^1.15.0"
+    "postcss-preset-mantine": "^1.15.0",
+    "typescript": "^5"
   },
   "devDependencies": {
     "@mantinex/mantine-logo": "^1.0.1",
     "eslint": "^8",
-    "eslint-config-next": "14.2.3",
-    "typescript": "^5"
+    "eslint-config-next": "14.2.3"
   }
 }
