@@ -29,7 +29,6 @@
     "react-dom": "^18",
     "react-toastify": "^10.0.5",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5",
     "zustand": "^4.5.2",
     "postcss": "^8.4.38",
     "postcss-simple-vars": "^7.0.1",
